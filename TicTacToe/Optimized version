@@ -1,0 +1,452 @@
+Recommended Project Structure
+tictactoe/
+│
+├── model/
+│   ├── Board.java
+│   ├── Move.java
+│   ├── Symbol.java
+│   ├── Player.java
+│   └── PlayerStats.java
+│
+├── rules/
+│   ├── TicTacToeRules.java
+│   └── EfficientTicTacToeRules.java
+│
+├── observer/
+│   ├── IObserver.java
+│   └── ConsoleNotifier.java
+│
+├── game/
+│   ├── GameState.java
+│   └── TicTacToeGame.java
+│
+├── strategy/
+│   ├── MoveStrategy.java
+│   └── HumanMoveStrategy.java
+│
+├── factory/
+│   ├── GameType.java
+│   └── TicTacToeGameFactory.java
+│
+└── TicTacToeMain.java
+Core Optimized Design
+Optimized Tic Tac Toe - LLD
+1. Symbol.java
+package model;
+
+import java.util.Objects;
+
+public class Symbol {
+
+    private char mark;
+
+    public Symbol(char mark) {
+        this.mark = mark;
+    }
+
+    public char getMark() {
+        return mark;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) return true;
+
+        if(o == null || getClass() != o.getClass())
+            return false;
+
+        Symbol symbol = (Symbol) o;
+
+        return mark == symbol.mark;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mark);
+    }
+}
+2. Move.java
+package model;
+
+public class Move {
+
+    private int row;
+    private int col;
+
+    public Move(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+}
+3. Player.java
+package model;
+
+import strategy.MoveStrategy;
+
+public class Player {
+
+    private int id;
+    private String name;
+    private Symbol symbol;
+    private int score;
+
+    private MoveStrategy strategy;
+
+    public Player(
+            int id,
+            String name,
+            Symbol symbol,
+            MoveStrategy strategy
+    ) {
+        this.id = id;
+        this.name = name;
+        this.symbol = symbol;
+        this.strategy = strategy;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public MoveStrategy getStrategy() {
+        return strategy;
+    }
+
+    public void incrementScore() {
+        score++;
+    }
+}
+4. PlayerStats.java
+package model;
+
+public class PlayerStats {
+
+    public int[] rows;
+    public int[] cols;
+
+    public int diagonal;
+    public int antiDiagonal;
+
+    public PlayerStats(int size) {
+        rows = new int[size];
+        cols = new int[size];
+    }
+}
+5. Board.java
+package model;
+
+public class Board {
+
+    private Symbol[][] grid;
+
+    private int size;
+
+    private Symbol emptyCell;
+
+    public Board(int size) {
+
+        this.size = size;
+
+        emptyCell = new Symbol('-');
+
+        grid = new Symbol[size][size];
+
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
+                grid[i][j] = emptyCell;
+            }
+        }
+    }
+
+    public boolean isWithinBounds(int row, int col) {
+        return row >= 0 &&
+               row < size &&
+               col >= 0 &&
+               col < size;
+    }
+
+    public boolean isCellEmpty(int row, int col) {
+        return grid[row][col].equals(emptyCell);
+    }
+
+    public boolean placeMove(Move move, Symbol symbol) {
+
+        int row = move.getRow();
+        int col = move.getCol();
+
+        if(!isWithinBounds(row, col))
+            return false;
+
+        if(!isCellEmpty(row, col))
+            return false;
+
+        grid[row][col] = symbol;
+
+        return true;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void display() {
+
+        System.out.println();
+
+        for(int i = 0; i < size; i++) {
+
+            for(int j = 0; j < size; j++) {
+                System.out.print(grid[i][j].getMark() + " ");
+            }
+
+            System.out.println();
+        }
+
+        System.out.println();
+    }
+}
+6. MoveStrategy.java
+package strategy;
+
+import model.Board;
+import model.Move;
+
+public interface MoveStrategy {
+
+    Move makeMove(Board board);
+}
+7. HumanMoveStrategy.java
+package strategy;
+
+import model.Board;
+import model.Move;
+
+import java.util.Scanner;
+
+public class HumanMoveStrategy implements MoveStrategy {
+
+    private Scanner scanner;
+
+    public HumanMoveStrategy() {
+        scanner = new Scanner(System.in);
+    }
+
+    @Override
+    public Move makeMove(Board board) {
+
+        System.out.print("Enter row and col: ");
+
+        int row = scanner.nextInt();
+        int col = scanner.nextInt();
+
+        return new Move(row, col);
+    }
+}
+8. TicTacToeRules.java
+package rules;
+
+import model.Move;
+import model.Player;
+
+public interface TicTacToeRules {
+
+    boolean checkWin(Player player, Move move);
+
+    boolean checkDraw(int totalMoves);
+}
+9. EfficientTicTacToeRules.java
+package rules;
+
+import model.Move;
+import model.Player;
+import model.PlayerStats;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class EfficientTicTacToeRules
+        implements TicTacToeRules {
+
+    private int size;
+
+    private Map<Player, PlayerStats> statsMap;
+
+    public EfficientTicTacToeRules(
+            int size,
+            List<Player> players
+    ) {
+
+        this.size = size;
+
+        statsMap = new HashMap<>();
+
+        for(Player player : players) {
+            statsMap.put(player, new PlayerStats(size));
+        }
+    }
+
+    @Override
+    public boolean checkWin(Player player, Move move) {
+
+        int row = move.getRow();
+        int col = move.getCol();
+
+        PlayerStats stats = statsMap.get(player);
+
+        stats.rows[row]++;
+        stats.cols[col]++;
+
+        if(row == col)
+            stats.diagonal++;
+
+        if(row + col == size - 1)
+            stats.antiDiagonal++;
+
+        return (
+                stats.rows[row] == size ||
+                stats.cols[col] == size ||
+                stats.diagonal == size ||
+                stats.antiDiagonal == size
+        );
+    }
+
+    @Override
+    public boolean checkDraw(int totalMoves) {
+        return totalMoves == size * size;
+    }
+}
+10. GameState.java
+package game;
+
+public enum GameState {
+    IN_PROGRESS,
+    DRAW,
+    FINISHED
+}
+11. TicTacToeGame.java
+package game;
+
+import model.Board;
+import model.Move;
+import model.Player;
+import rules.TicTacToeRules;
+
+import java.util.Deque;
+
+public class TicTacToeGame {
+
+    private Board board;
+
+    private Deque<Player> players;
+
+    private TicTacToeRules rules;
+
+    private GameState state;
+
+    private int totalMoves;
+
+    public TicTacToeGame(
+            Board board,
+            Deque<Player> players,
+            TicTacToeRules rules
+    ) {
+        this.board = board;
+        this.players = players;
+        this.rules = rules;
+
+        state = GameState.IN_PROGRESS;
+    }
+
+    public void play() {
+
+        while(state == GameState.IN_PROGRESS) {
+
+            board.display();
+
+            Player currentPlayer = players.peekFirst();
+
+            Move move =
+                    currentPlayer
+                    .getStrategy()
+                    .makeMove(board);
+
+            boolean success =
+                    board.placeMove(
+                            move,
+                            currentPlayer.getSymbol()
+                    );
+
+            if(!success) {
+                System.out.println("Invalid move!");
+                continue;
+            }
+
+            totalMoves++;
+
+            boolean won =
+                    rules.checkWin(
+                            currentPlayer,
+                            move
+                    );
+
+            if(won) {
+
+                board.display();
+
+                System.out.println(
+                        currentPlayer.getName() + " wins!"
+                );
+
+                state = GameState.FINISHED;
+
+                break;
+            }
+
+            if(rules.checkDraw(totalMoves)) {
+
+                board.display();
+
+                System.out.println("Draw!");
+
+                state = GameState.DRAW;
+
+                break;
+            }
+
+            players.removeFirst();
+            players.addLast(currentPlayer);
+        }
+    }
+}
+12. Advantages of Optimized Design
+Time Complexity
+
+Old approach:
+
+O(N²) per move
+
+Optimized approach:
+
+O(1) per move
+Design Improvements
+Strategy Pattern for moves
+Strategy Pattern for rules
+O(1) winner detection
+Better separation of concerns
+Extensible for bot players
+Extensible for multiple rule sets
+Cleaner game orchestration
+Interview-level scalable design
