@@ -35,7 +35,7 @@ public class Main {
             System.out.println("Please Enter head and tail position of snake: "+i);
             int head=sc.nextInt();
             int tail=sc.nextInt();
-            if(snakeAndLadderGame.board.addSnakes(head, tail)) {
+            if(snakeAndLadderGame.addSnake(head, tail)) {
                 i++;
             } else {
                 System.out.println("Snake with this head already exists, Pls try again!");
@@ -48,7 +48,7 @@ public class Main {
             System.out.println("Please Enter start and end position of ladder: "+i);
             int start=sc.nextInt();
             int end=sc.nextInt();
-            if(snakeAndLadderGame.board.addLadders(start,end)){
+            if(snakeAndLadderGame.addLadder(start,end)){
                 i++;
             } else {
                 System.out.println("Ladder with this start position already exists, Pls try again!");

@@ -20,6 +20,14 @@ public class SnakeAndLadderGame {
         this.observerList=new ArrayList<>();
     }
 
+    public boolean addSnake(int head, int tail){
+        return this.board.addSnakes(head, tail);
+    }
+
+    public boolean addLadder(int start, int end){
+        return this.board.addLadders(start,end);
+    }
+
     public void addPlayer(Player player){
         players.add(player);
     }
