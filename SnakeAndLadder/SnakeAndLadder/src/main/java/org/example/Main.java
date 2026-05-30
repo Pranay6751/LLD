@@ -48,7 +48,7 @@ public class Main {
             System.out.println("Please Enter start and end position of ladder: "+i);
             int start=sc.nextInt();
             int end=sc.nextInt();
-            if(snakeAndLadderGame.board.addLadders(20start,end)){
+            if(snakeAndLadderGame.board.addLadders(start,end)){
                 i++;
             } else {
                 System.out.println("Ladder with this start position already exists, Pls try again!");
