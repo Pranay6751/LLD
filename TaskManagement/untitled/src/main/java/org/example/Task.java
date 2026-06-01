@@ -3,6 +3,7 @@ package org.example;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class Task {
     int id;
@@ -69,10 +70,27 @@ public class Task {
 
     public void setAssignee(User assignee){
         this.assignee = assignee;
-        assignee.setTaskHistory(this);
+        assignee.addToTaskHistory(this);
     }
 
     public void setCreatedBy(User createdBy){
         this.createdBy = createdBy;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(this == obj) return true;
+
+        if(obj == null || obj.getClass()!=getClass()) {
+            return false;
+        }
+
+        Task other = (Task) obj;
+        return this.id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
     }
 }

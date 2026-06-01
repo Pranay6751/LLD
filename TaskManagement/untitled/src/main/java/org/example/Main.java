@@ -17,5 +17,8 @@ public class Main {
 
         System.out.println(task1.getStatus());
         System.out.println(user2.getTaskHistory());
+
+        taskManager.deleteTask(task1.getId());
+        System.out.println(user2.getTaskHistory());
     }
 }

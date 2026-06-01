@@ -21,8 +21,17 @@ public class User {
         return name;
     }
 
-    public void setTaskHistory(Task task){
+    public void addToTaskHistory(Task task){
         taskHistory.add(task);
+    }
+
+    public void removeFromTaskHistory(Task task){
+        for (Task curTask : taskHistory){
+            if(curTask.equals(task)){
+                taskHistory.remove(task);
+                break;
+            }
+        }
     }
 
     public List<Task> getTaskHistory(){

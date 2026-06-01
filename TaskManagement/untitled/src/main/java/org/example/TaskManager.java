@@ -30,6 +30,16 @@ public class TaskManager {
         return task;
     }
 
+    public void deleteTask(int taskId){
+        if(tasks.containsKey(taskId)){
+            Task task = tasks.get(taskId);
+            if(task!=null) {
+                User assignee = task.getAssignee();
+                assignee.removeFromTaskHistory(task);
+            }
+        }
+    }
+
     public void updateTaskStatus(int taskId, TaskStatus status){
         Task task = tasks.get(taskId);
         if(task!=null) {
