@@ -1,12 +1,9 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Task {
-    int id;
+    String id;
     String name;
     String description;
     TaskStatus status;
@@ -27,12 +24,12 @@ public class Task {
         comments = new ArrayList<>();
     }
 
-    public int generateId()
+    public String generateId()
     {
-        return (int) (System.currentTimeMillis()%Integer.MAX_VALUE);
+        return UUID.randomUUID().toString();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -68,8 +65,11 @@ public class Task {
         this.status = status;
     }
 
-    public void setAssignee(User assignee){
-        this.assignee = assignee;
+    public void setAssignee(User newassignee){
+        if(this.assignee!=null){
+            this.assignee.removeFromTaskHistory(this);
+        }
+        this.assignee = newassignee;
         assignee.addToTaskHistory(this);
     }
 
@@ -86,11 +86,11 @@ public class Task {
         }
 
         Task other = (Task) obj;
-        return this.id == other.id;
+        return this.id.equals(other.id);
     }
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(id);
+        return id.hashCode();
     }
 }

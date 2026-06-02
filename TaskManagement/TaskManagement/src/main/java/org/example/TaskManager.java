@@ -1,11 +1,13 @@
 package org.example;
 
 import java.net.Inet4Address;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class TaskManager {
-    HashMap<Integer, Task> tasks;
-    HashMap<Integer, User> users;
+    HashMap<String, Task> tasks;
+    HashMap<String, User> users;
 
     private static volatile TaskManager taskManagerInstance;
     private TaskManager(){
@@ -36,6 +38,7 @@ public class TaskManager {
             if(task!=null) {
                 User assignee = task.getAssignee();
                 assignee.removeFromTaskHistory(task);
+                tasks.remove(task.getId());
             }
         }
     }
@@ -55,7 +58,7 @@ public class TaskManager {
         return user;
     }
 
-    public void assignTask(int taskId, User user){
+    public void assignTask(String taskId, User user){
         Task task = tasks.get(taskId);
         if(task!=null) {
             synchronized (task){
@@ -64,11 +67,28 @@ public class TaskManager {
         }
     }
 
-    public void addComment(int taskId, String msg, User user){
+    public void addComment(String taskId, String msg, User user){
         Task task = tasks.get(taskId);
         if(task!=null){
             task.addComment(new Comment(user, msg));
         }
+    }
+
+    public List<Task> searchTasks(TaskSearchCriteria searchCriteria){
+        List<Task> res = new ArrayList<>();
+        for(Task task: tasks.values()){
+            if(searchCriteria.getStatus()!=null && searchCriteria.getStatus()!=task.getStatus()) {
+                continue;
+            }
+            if(searchCriteria.getPriority()!=null && searchCriteria.getPriority()!=task.getPriority()){
+                continue;
+            }
+            if(searchCriteria.getAssignee()!=null && searchCriteria.getAssignee()!=task.getAssignee()){
+                continue;
+            }
+            res.add(task);
+        }
+        return res;
     }
 
 

@@ -2,9 +2,10 @@ package org.example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class User {
-    int id;
+    String id;
     String name;
     List<Task> taskHistory;
     public User(String name){
@@ -13,7 +14,7 @@ public class User {
         taskHistory = new ArrayList<>();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -26,20 +27,22 @@ public class User {
     }
 
     public void removeFromTaskHistory(Task task){
-        for (Task curTask : taskHistory){
-            if(curTask.equals(task)){
-                taskHistory.remove(task);
-                break;
-            }
-        }
+//        for (Task curTask : taskHistory){
+//            if(curTask.equals(task)){
+//                taskHistory.remove(task);
+//                break;
+//            }
+//        }
+        //as we override equals directly remove taskHistory
+        taskHistory.remove(task);
     }
 
     public List<Task> getTaskHistory(){
         return taskHistory;
     }
 
-    public int generateId()
+    public String generateId()
     {
-        return (int) (System.currentTimeMillis()%Integer.MAX_VALUE);
+        return UUID.randomUUID().toString();
     }
 }
